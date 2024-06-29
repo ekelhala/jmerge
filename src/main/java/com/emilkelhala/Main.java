@@ -1,6 +1,5 @@
 package com.emilkelhala;
 
-import org.apache.commons.cli.ParseException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
 import java.io.File;
