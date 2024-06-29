@@ -1,6 +1,7 @@
 package com.emilkelhala;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -25,7 +26,7 @@ public class PDFMerger {
      * @param documents Documents to be merged
      * @return Document containing the merged documents, in the order they were given
      */
-    public PDDocument merge(PDDocument[] documents) throws IOException {
+    public PDDocument merge(List<PDDocument> documents) throws IOException {
         PDDocument ret = new PDDocument();
         for(PDDocument document : documents) {
                 merger.appendDocument(ret, document);
