@@ -9,6 +9,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 public class PDFMerger {
     
     private PDFMergerUtility merger;
+    private String dest;
 
     /**
      * Setup the merger
@@ -16,7 +17,7 @@ public class PDFMerger {
      */
     public PDFMerger(String dest){
         merger = new PDFMergerUtility();
-        merger.setDestinationFileName(dest);
+        this.dest = dest;
     }
 
     /**
@@ -34,7 +35,7 @@ public class PDFMerger {
         return ret;
     }
 
-    public void save() throws IOException {
-        merger.mergeDocuments(null);
+    public void save(PDDocument document) throws IOException {
+        document.save(dest);
     }
 }
