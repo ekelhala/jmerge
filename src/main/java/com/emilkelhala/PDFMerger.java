@@ -38,4 +38,8 @@ public class PDFMerger {
     public void save(PDDocument document) throws IOException {
         document.save(dest);
     }
+
+    public void setDestination(String dest) {
+        this.dest = dest;
+    }
 }
