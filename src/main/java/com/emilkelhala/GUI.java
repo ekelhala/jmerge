@@ -100,10 +100,13 @@ public class GUI implements ActionListener {
         if(eventSource.equals(addDocument)) {
             final JFileChooser fc = new JFileChooser();
             fc.setFileFilter(new FileNameExtensionFilter("PDF files", "pdf"));
+            fc.setMultiSelectionEnabled(true);
             int ret = fc.showOpenDialog(frame);
             if(ret == JFileChooser.APPROVE_OPTION) {
-                selectedFiles.add(fc.getSelectedFile());
-                fileListModel.addElement(fc.getSelectedFile().getName());
+                for(File file : fc.getSelectedFiles()) {
+                    selectedFiles.add(file);
+                    fileListModel.addElement(file.getName());
+                }
             }
         }
         else if(eventSource.equals(removeDocument)) {
