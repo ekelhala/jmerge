@@ -116,7 +116,7 @@ public class GUI implements ActionListener {
                 selectedFiles.remove(selectedIndex);
         }
         else if(eventSource.equals(performMerge)) {
-            if(outputFile.getText().isBlank()) {
+            if(outputFile.getText().isEmpty()) {
                 JOptionPane.showMessageDialog(frame, "No output file specified", "JMerge - Error", JOptionPane.ERROR_MESSAGE);
             }
             else if(selectedFiles.isEmpty() || selectedFiles.size() < 2) {
