@@ -143,6 +143,7 @@ public class GUI implements ActionListener {
         }
         catch(Exception e) {
             JOptionPane.showMessageDialog(frame, "Merge failed", "JMerge - Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
         JOptionPane.showMessageDialog(frame, "Merge done!");
     }
