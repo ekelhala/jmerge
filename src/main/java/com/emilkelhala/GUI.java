@@ -15,6 +15,7 @@ import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -50,6 +51,10 @@ public class GUI implements ActionListener {
         frame = new JFrame(TITLE);
         frame.setSize(400, 400);
         frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
+        // Add instructions
+        JPanel instructionsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        instructionsPanel.add(new JLabel("Drag & drop to reorder the items"));
+        frame.add(instructionsPanel);
         frame.add(Box.createRigidArea(filler));
         // Add file list
         fileList = new JList<File>(fileListModel);
@@ -70,10 +75,13 @@ public class GUI implements ActionListener {
         removeDocument.addActionListener(this);
         fileActionButtonPanel.add(removeDocument);
         frame.add(fileActionButtonPanel);
+        // Add actions
         frame.add(Box.createRigidArea(new Dimension(0, 10)));
         performMerge = new JButton("Merge");
         performMerge.addActionListener(this);
-        frame.add(performMerge);
+        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        actionPanel.add(performMerge);
+        frame.add(actionPanel);
         frame.add(Box.createRigidArea(filler));
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
