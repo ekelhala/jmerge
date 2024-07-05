@@ -19,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -64,7 +65,7 @@ public class GUI implements ActionListener {
         fileList.setDragEnabled(true);
         fileList.setDropMode(DropMode.ON);
         fileList.setTransferHandler(new FileListTransferHandler(fileList));
-        frame.add(fileList);
+        frame.add(new JScrollPane(fileList));
         frame.add(Box.createRigidArea(filler));
         // Add buttons
         JPanel fileActionButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
