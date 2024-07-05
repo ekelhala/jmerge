@@ -5,6 +5,12 @@ This is a small hobby project to make life a little bit easier. JMerge is a free
 
 <img src="./img/screenshot.png" width="250">
 
+## Features
+
+- Select multiple PDF-files at once
+- Reorder or remove selected files
+- Merge and export to PDF-format
+
 # Usage
 
 You can either build the tool by yourself, or download it.
