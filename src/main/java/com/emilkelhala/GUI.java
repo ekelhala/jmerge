@@ -27,16 +27,12 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.DropMode;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
-import javax.swing.TransferHandler;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -76,53 +72,7 @@ public class GUI implements ActionListener {
         fileList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         fileList.setDragEnabled(true);
         fileList.setDropMode(DropMode.ON);
-        fileList.setTransferHandler(new TransferHandler() {
-            public boolean canImport(TransferHandler.TransferSupport info) {
-                if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                    return false;
-                }
- 
-                JList.DropLocation dl = (JList.DropLocation)info.getDropLocation();
-                if (dl.getIndex() == -1) {
-                    return false;
-                }
-                return true;
-            }
- 
-            public boolean importData(TransferHandler.TransferSupport info) {
-                if (!info.isDrop() || !canImport(info)) {
-                    return false;
-                }
-                 
-                // Check for String flavor
-                if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                    return false;
-                }
- 
-                JList.DropLocation dl = (JList.DropLocation)info.getDropLocation();
-                DefaultListModel<File> listModel = (DefaultListModel<File>)fileList.getModel();
-                int index = dl.getIndex(); 
-                Transferable t = info.getTransferable();
-                String data;
-                try {
-                    data = (String)t.getTransferData(DataFlavor.stringFlavor);
-                } 
-                catch (Exception e) { return false; }
-                File target = new File(data);  
-                listModel.removeElement(target);
-                listModel.add(index, target);
-                return true;
-            }
-             
-            public int getSourceActions(JComponent c) {
-                return MOVE;
-            }
-             
-            protected Transferable createTransferable(JComponent c) {
-                JList<File> list = (JList<File>)c;
-                return new StringSelection(list.getSelectedValue().getAbsolutePath());
-            }
-        });
+        fileList.setTransferHandler(new FileListTransferHandler(fileList));
         frame.add(fileList);
         frame.add(Box.createRigidArea(filler));
         // Add buttons
