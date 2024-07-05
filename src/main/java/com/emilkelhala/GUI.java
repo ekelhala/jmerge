@@ -51,6 +51,7 @@ public class GUI implements ActionListener {
 
         frame = new JFrame(TITLE);
         frame.setSize(400, 400);
+        frame.setLocationRelativeTo(null);
         frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
         // Add instructions
         JPanel instructionsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
