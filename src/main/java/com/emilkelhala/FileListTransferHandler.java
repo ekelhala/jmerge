@@ -63,6 +63,7 @@ public int getSourceActions(JComponent c) {
 }
 
 @Override
+@SuppressWarnings("unchecked")
 protected Transferable createTransferable(JComponent c) {
     JList<File> list = (JList<File>)c;
     return new StringSelection(list.getSelectedValue().getAbsolutePath());
