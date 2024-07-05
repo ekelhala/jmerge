@@ -4,20 +4,39 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragGestureRecognizer;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceDropEvent;
+import java.awt.dnd.DragSourceEvent;
+import java.awt.dnd.DragSourceListener;
+import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
+import javax.swing.DropMode;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
+import javax.swing.TransferHandler;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -32,10 +51,9 @@ public class GUI implements ActionListener {
     private JButton performMerge;
     private JButton removeDocument;
 
-    private JList<String> fileList;
-    private DefaultListModel<String> fileListModel;
+    private JList<File> fileList;
+    private DefaultListModel<File> fileListModel;
 
-    private List<File> selectedFiles;
     private PDFMerger myMerger;
 
     // Create gaps
@@ -44,8 +62,7 @@ public class GUI implements ActionListener {
     public GUI() {
 
         //Initialize variables
-        this.selectedFiles = new ArrayList<>();
-        this.fileListModel = new DefaultListModel<String>();
+        this.fileListModel = new DefaultListModel<File>();
         myMerger = new PDFMerger(null);
 
         frame = new JFrame(TITLE);
@@ -53,9 +70,59 @@ public class GUI implements ActionListener {
         frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
         frame.add(Box.createRigidArea(filler));
         // Add file list
-        fileList = new JList<String>(fileListModel);
+        fileList = new JList<File>(fileListModel);
+        fileList.setCellRenderer(new FileListCellRenderer());
         fileList.setLayoutOrientation(JList.VERTICAL);
         fileList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        fileList.setDragEnabled(true);
+        fileList.setDropMode(DropMode.ON);
+        fileList.setTransferHandler(new TransferHandler() {
+            public boolean canImport(TransferHandler.TransferSupport info) {
+                if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                    return false;
+                }
+ 
+                JList.DropLocation dl = (JList.DropLocation)info.getDropLocation();
+                if (dl.getIndex() == -1) {
+                    return false;
+                }
+                return true;
+            }
+ 
+            public boolean importData(TransferHandler.TransferSupport info) {
+                if (!info.isDrop() || !canImport(info)) {
+                    return false;
+                }
+                 
+                // Check for String flavor
+                if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                    return false;
+                }
+ 
+                JList.DropLocation dl = (JList.DropLocation)info.getDropLocation();
+                DefaultListModel<File> listModel = (DefaultListModel<File>)fileList.getModel();
+                int index = dl.getIndex(); 
+                Transferable t = info.getTransferable();
+                String data;
+                try {
+                    data = (String)t.getTransferData(DataFlavor.stringFlavor);
+                } 
+                catch (Exception e) { return false; }
+                File target = new File(data);  
+                listModel.removeElement(target);
+                listModel.add(index, target);
+                return true;
+            }
+             
+            public int getSourceActions(JComponent c) {
+                return MOVE;
+            }
+             
+            protected Transferable createTransferable(JComponent c) {
+                JList<File> list = (JList<File>)c;
+                return new StringSelection(list.getSelectedValue().getAbsolutePath());
+            }
+        });
         frame.add(fileList);
         frame.add(Box.createRigidArea(filler));
         // Add buttons
@@ -88,8 +155,7 @@ public class GUI implements ActionListener {
             int ret = fc.showOpenDialog(frame);
             if(ret == JFileChooser.APPROVE_OPTION) {
                 for(File file : fc.getSelectedFiles()) {
-                    selectedFiles.add(file);
-                    fileListModel.addElement(file.getName());
+                    fileListModel.addElement(file);
                 }
             }
         }
@@ -97,10 +163,9 @@ public class GUI implements ActionListener {
             int selectedIndex = fileList.getSelectedIndex();
             if(selectedIndex > -1)
                 fileListModel.removeElementAt(selectedIndex);
-                selectedFiles.remove(selectedIndex);
         }
         else if(eventSource.equals(performMerge)) {
-            if(selectedFiles.isEmpty() || selectedFiles.size() < 2) {
+            if(fileListModel.isEmpty() || fileListModel.size() < 2) {
                 JOptionPane.showMessageDialog(frame, "Too few files", "JMerge - Error", JOptionPane.ERROR_MESSAGE);
             }
             else {
@@ -113,18 +178,18 @@ public class GUI implements ActionListener {
         myMerger.setDestination(destPath);
         try {
             List<PDDocument> docsToMerge = new ArrayList<>();
-            for(File file : selectedFiles) {
-                docsToMerge.add(PDDocument.load(file));
+            for(int i=0;i<fileListModel.size();i++) {
+                docsToMerge.add(PDDocument.load(fileListModel.get(i)));
             }
             PDDocument result = myMerger.merge(docsToMerge);
             myMerger.save(result);
         }
         catch(Exception e) {
             JOptionPane.showMessageDialog(frame, "Merge failed", "JMerge - Error", JOptionPane.ERROR_MESSAGE);
+            System.out.println(e);
             return;
         }
         fileListModel.removeAllElements();
-        selectedFiles.clear();
         JOptionPane.showMessageDialog(frame, "Merge done!");
     }
 
