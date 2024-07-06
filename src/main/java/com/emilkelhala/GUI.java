@@ -35,8 +35,8 @@ public class GUI implements ActionListener {
     private JButton performMerge;
     private JButton removeDocument;
 
-    private JList<File> fileList;
-    private DefaultListModel<File> fileListModel;
+    private JList<FileListItem> fileList;
+    private DefaultListModel<FileListItem> fileListModel;
 
     private PDFMerger myMerger;
 
@@ -46,7 +46,7 @@ public class GUI implements ActionListener {
     public GUI() {
 
         //Initialize variables
-        this.fileListModel = new DefaultListModel<File>();
+        this.fileListModel = new DefaultListModel<FileListItem>();
         myMerger = new PDFMerger(null);
 
         frame = new JFrame(TITLE);
@@ -59,7 +59,7 @@ public class GUI implements ActionListener {
         frame.add(instructionsPanel);
         frame.add(Box.createRigidArea(filler));
         // Add file list
-        fileList = new JList<File>(fileListModel);
+        fileList = new JList<FileListItem>(fileListModel);
         fileList.setCellRenderer(new FileListCellRenderer());
         fileList.setLayoutOrientation(JList.VERTICAL);
         fileList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -101,7 +101,7 @@ public class GUI implements ActionListener {
             int ret = fc.showOpenDialog(frame);
             if(ret == JFileChooser.APPROVE_OPTION) {
                 for(File file : fc.getSelectedFiles()) {
-                    fileListModel.addElement(file);
+                    fileListModel.addElement(new FileListItem(file));
                 }
             }
         }
@@ -125,7 +125,7 @@ public class GUI implements ActionListener {
         try {
             List<PDDocument> docsToMerge = new ArrayList<>();
             for(int i=0;i<fileListModel.size();i++) {
-                docsToMerge.add(PDDocument.load(fileListModel.get(i)));
+                docsToMerge.add(PDDocument.load(fileListModel.get(i).getFile()));
             }
             PDDocument result = myMerger.merge(docsToMerge);
             myMerger.save(result);

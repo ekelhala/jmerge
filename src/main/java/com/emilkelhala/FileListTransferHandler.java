@@ -3,7 +3,6 @@ package com.emilkelhala;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
-import java.io.File;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
@@ -12,9 +11,9 @@ import javax.swing.TransferHandler;
 
 public class FileListTransferHandler extends TransferHandler {
     
-    private JList<File> fileList;
+    private JList<FileListItem> fileList;
 
-    public FileListTransferHandler(JList<File> fileList) {
+    public FileListTransferHandler(JList<FileListItem> fileList) {
         super();
         this.fileList = fileList;
     }
@@ -43,7 +42,7 @@ public boolean importData(TransferHandler.TransferSupport info) {
     }
 
     JList.DropLocation dl = (JList.DropLocation)info.getDropLocation();
-    DefaultListModel<File> listModel = (DefaultListModel<File>)fileList.getModel();
+    DefaultListModel<FileListItem> listModel = (DefaultListModel<FileListItem>)fileList.getModel();
     int index = dl.getIndex(); 
     Transferable t = info.getTransferable();
     String data;
@@ -51,7 +50,12 @@ public boolean importData(TransferHandler.TransferSupport info) {
         data = (String)t.getTransferData(DataFlavor.stringFlavor);
     } 
     catch (Exception e) { return false; }
-    File target = new File(data);  
+    FileListItem target = null;
+    for(int i = 0; i < listModel.size(); i++) {
+        if(data.equals(listModel.get(i).getId())) {
+            target = listModel.get(i);
+        }
+    }
     listModel.removeElement(target);
     listModel.add(index, target);
     return true;
@@ -65,7 +69,7 @@ public int getSourceActions(JComponent c) {
 @Override
 @SuppressWarnings("unchecked")
 protected Transferable createTransferable(JComponent c) {
-    JList<File> list = (JList<File>)c;
-    return new StringSelection(list.getSelectedValue().getAbsolutePath());
+    JList<FileListItem> list = (JList<FileListItem>)c;
+    return new StringSelection(list.getSelectedValue().getId());
 }
 }
