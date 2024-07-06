@@ -30,35 +30,30 @@ public class FileListTransferHandler extends TransferHandler {
         }
         return true;
     }
- @Override
-public boolean importData(TransferHandler.TransferSupport info) {
-    if (!info.isDrop() || !canImport(info)) {
-        return false;
-    }
-        
-    // Check for String flavor
-    if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-        return false;
-    }
 
-    JList.DropLocation dl = (JList.DropLocation)info.getDropLocation();
-    DefaultListModel<FileListItem> listModel = (DefaultListModel<FileListItem>)fileList.getModel();
-    int index = dl.getIndex(); 
-    Transferable t = info.getTransferable();
-    String data;
-    try {
-        data = (String)t.getTransferData(DataFlavor.stringFlavor);
-    } 
-    catch (Exception e) { return false; }
-    FileListItem target = null;
-    for(int i = 0; i < listModel.size(); i++) {
-        if(data.equals(listModel.get(i).getId())) {
-            target = listModel.get(i);
+    @Override
+    public boolean importData(TransferHandler.TransferSupport info) {
+        if (!info.isDrop() || !canImport(info) || !info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+            return false;
         }
-    }
-    listModel.removeElement(target);
-    listModel.add(index, target);
-    return true;
+        JList.DropLocation dl = (JList.DropLocation)info.getDropLocation();
+        DefaultListModel<FileListItem> listModel = (DefaultListModel<FileListItem>)fileList.getModel();
+        int index = dl.getIndex(); 
+        Transferable t = info.getTransferable();
+        String data;
+        try {
+            data = (String)t.getTransferData(DataFlavor.stringFlavor);
+        } 
+        catch (Exception e) { return false; }
+        FileListItem target = null;
+        for(int i = 0; i < listModel.size(); i++) {
+            if(data.equals(listModel.get(i).getId())) {
+                target = listModel.get(i);
+            }
+        }
+        listModel.removeElement(target);
+        listModel.add(index, target);
+        return true;
 }
 
 @Override
